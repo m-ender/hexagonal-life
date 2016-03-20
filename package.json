@@ -1,0 +1,16 @@
+{
+  "name": "Hexagonal-Life",
+  "description": "Game of Life simulator on a hexagonal grid.",
+  "author": "Martin Büttner",
+  "version": "0.0.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbuettner/hexagonal-life"
+  },
+  "dependencies": {
+    "express": "4.13.4",
+    "morgan": "1.7.0"
+  },
+  "engine": "node 5.9.0"
+}
