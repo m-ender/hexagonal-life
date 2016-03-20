@@ -12,6 +12,8 @@ var gl;
 var shaderProgram = {};
 
 var viewPort = {};
+var pixelSize;
+var aspectRatio;
 
 // Timing
 // We need these to fix the framerate
@@ -34,9 +36,17 @@ function init()
 {
     canvas = document.getElementById("gl-canvas");
 
-    // This is the size we are rendering to
-    viewPort.width = resolution;
-    viewPort.height = resolution;
+    // This is the size we are rendering to.
+    // The 600 are for two margins, 300px each.
+    viewPort.width = window.innerWidth - 600;
+    viewPort.height = window.innerHeight;
+
+    aspectRatio = viewPort.width / viewPort.height;
+    maxXCoord = maxYCoord * aspectRatio;
+    pixelSize = 2*maxYCoord / viewPort.width;
+    markerRadius = 3*pixelSize;
+    lineThickness = 2*pixelSize;
+
     // This is the actual extent of the canvas on the page
     canvas.style.width = viewPort.width;
     canvas.style.height = viewPort.height;
@@ -77,6 +87,7 @@ function init()
     shaderProgram.uCenter = gl.getUniformLocation(shaderProgram.program, "uCenter");
     shaderProgram.uColor = gl.getUniformLocation(shaderProgram.program, "uColor");
     shaderProgram.uScale = gl.getUniformLocation(shaderProgram.program, "uScale");
+    shaderProgram.uAspectRatio = gl.getUniformLocation(shaderProgram.program, "uAspectRatio");
     shaderProgram.uAngle = gl.getUniformLocation(shaderProgram.program, "uAngle");
     // add attribute locations
     shaderProgram.aPos = gl.getAttribLocation(shaderProgram.program, "aPos");
@@ -84,6 +95,7 @@ function init()
     // fill uniforms that are already known
     gl.useProgram(shaderProgram.program);
     gl.uniform1f(shaderProgram.uRenderScale, renderScale);
+    gl.uniform1f(shaderProgram.uAspectRatio, aspectRatio);
     gl.uniform1f(shaderProgram.uViewPortAngle, angle);
 
     gl.useProgram(null);
@@ -264,7 +276,7 @@ function handleMouseDown(event) {
     var rect = canvas.getBoundingClientRect();
     var coords = normaliseCursorCoordinates(event, rect);
 
-    if (coords.x < -maxCoord || coords.x > maxCoord || coords.y < -maxCoord || coords.y > maxCoord)
+    if (coords.x < -maxXCoord || coords.x > maxXCoord || coords.y < -maxYCoord || coords.y > maxYCoord)
         return;
 
     if (debug)
@@ -304,8 +316,8 @@ function handleCharacterInput(event) {
 // It also accounts for the rotation of the grid.
 function normaliseCursorCoordinates(event, rect)
 {
-    var x = (2*(event.clientX - rect.left) / resolution - 1) / renderScale;
-    var y = (1 - 2*(event.clientY - rect.top) / resolution) / renderScale; // invert, to make positive y point upwards
+    var x = (2*(event.clientX - rect.left) / viewPort.width - 1) / renderScale * aspectRatio;
+    var y = (1 - 2*(event.clientY - rect.top) / viewPort.height) / renderScale; // invert, to make positive y point upwards
     return {
         x:  x*cos(angle) + y*sin(angle),
         y: -x*sin(angle) + y*cos(angle)

@@ -16,39 +16,14 @@ body {
     cursor: default;
 }
 
-#title {
-    position: absolute;
-    font-family: Consolas;
-    left: 100px;
-    width: 1624px;
-    height: 75px;
-    top: 25px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 36pt;
-    color: #BED4DF;
-}
-
-#gl-canvas {
-    position: absolute;
-    left: 400px;
-    top: 100px;
-    background: #323E4E;
-    width: 1024;
-    height: 1024;
-    display: block;
-}
-
 #menu{
     padding: 5px;
     background: #2D3032;
     color: #BED4DF;
     position: absolute;
-    left: 100px;
-    top: 100px;
     font-family: Consolas;
     width: 290px;
-    height: 1014px;
+    height: 100%;
     overflow-y: auto;
 }
 
@@ -60,16 +35,22 @@ body {
     color: #78A3B9;
 }
 
+#gl-canvas {
+    position: absolute;
+    top: 0px;
+    left: 300px;
+    display: block;
+}
+
 #debug{
     padding: 5px;
     background: #2D3032;
     color: #BED4DF;
     position: absolute;
-    left: 1424px;
-    top: 100px;
+    right: 0px;
     font-family: Consolas;
     width: 290px;
-    height: 1014px;
+    height: 100%;
     overflow-y: auto;
 }
 

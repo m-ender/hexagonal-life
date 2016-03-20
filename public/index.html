@@ -6,7 +6,7 @@
 
     <link rel="stylesheet" type="text/css" href="main.css" />
 
-    <script type="text/javascript" src="jquery-2.1.0.js"></script>
+    <script type="text/javascript" src="jquery-2.2.2.js"></script>
     <script type="text/javascript" src="jquery.color-2.1.2.js"></script>
 
     <script type="text/javascript" src="webgl-utils.js"></script>
@@ -27,6 +27,7 @@
         #define PI 3.1415926535897932384626433832795
 
         uniform float uRenderScale;
+        uniform float uAspectRatio;
         // This is the angle by which the entire view port is rotated
         uniform float uGridAngle;
 
@@ -46,7 +47,7 @@
             float x = aPos.x * cos(uAngle) - aPos.y * sin(uAngle);
             float y = aPos.x * sin(uAngle) + aPos.y * cos(uAngle);
 
-            x = uRenderScale * (uCenter.x + uScale * x);
+            x = uRenderScale * (uCenter.x + uScale * x) / uAspectRatio;
             y = uRenderScale * (uCenter.y + uScale * y);
 
             // The render scale shrinks or grows the viewport and refers to which percentage
@@ -72,7 +73,6 @@
 
 </head>
 <body id="body">
-    <div id="title">Hexagonal Life</div>
     <canvas id="gl-canvas">
         Oops ... your browser doesn't support HTML5's Canvas elements!
     </canvas>
@@ -94,7 +94,5 @@
         x = <span id="xup"></span><br>
         y = <span id="yup"></span>
     </div>
-    <div id="data-left-div"><span id="data">Lives: 3</span></div>
-    <div id="data-right-div"><span id="data">Score: 0</span></div>
 </body>
 </html>
