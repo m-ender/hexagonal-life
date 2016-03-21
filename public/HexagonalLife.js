@@ -67,15 +67,17 @@ HexagonalLife.prototype.render = function() {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertices.bufferId);
     gl.vertexAttribPointer(shaderProgram.aPos, 2, gl.FLOAT, false, 0, 0);
 
-    for (var x = -1; x <= this.width; ++x)
-        for (var y = -1; y <= this.height; ++y) {
+    for (var y = -ceil(this.height/2)-1; y <= ceil(this.height/2); ++y) 
+        for (var x = -ceil((this.width+y)/2); x <= ceil((this.width-y)/2); ++x) {
             gl.uniform2f(shaderProgram.uCenter, 
-                         -maxXCoord + this.gridWidth*(x + 0.5*(mod(y,2))), 
-                         -maxYCoord + this.gridHeight*(y + 0.5));
+                         this.gridWidth*(x + 0.5*y), 
+                         this.gridHeight*(-y));
 
             var state = this.getState(x, y);
 
             var color = this.getColor(state);
+            if (this.activeX === x && this.activeY === y)
+                color = this.getColor(1);
 
             gl.uniform4f(shaderProgram.uColor,
                          color[0],
@@ -90,15 +92,21 @@ HexagonalLife.prototype.render = function() {
     gl.disableVertexAttribArray(shaderProgram.aPos);
 };
 
+HexagonalLife.prototype.highlight = function(x, y) {
+    var axial = this.pixelToAxial(x, y);
+    this.activeX = axial.q;
+    this.activeY = axial.r;
+};
+
 // "Destructor" - this has to be called manually
 HexagonalLife.prototype.destroy = function() {
     gl.deleteBuffer(this.vertices.bufferId);
     delete this.vertices;
 };
 
-function pixelToAxial(x, y) {
-    var a = 2/3 * x;
-    var b = (- sqrt(3)*y - x)/3;
+HexagonalLife.prototype.pixelToAxial = function(x, y) {
+    var a = (sqrt(3)*x + y)/3 / this.gridSize;
+    var b = - 2/3 * y / this.gridSize;
     var c = - a - b;
 
     var ra = round(a);

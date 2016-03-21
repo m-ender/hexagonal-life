@@ -251,6 +251,7 @@ function handleMouseMove(event) {
     var rect = canvas.getBoundingClientRect();
     var coords = normaliseCursorCoordinates(event, rect);
 
+    life.highlight(coords.x, coords.y);
     if (debug)
     {
         debugBox.find('#xcoord').html(coords.x);
