@@ -1,7 +1,6 @@
 var debug = true;
 
 var canvas;
-var messageBox;
 var optionsBox;
 var debugBox;
 
@@ -29,6 +28,8 @@ var angle = 0;
 var circles = [];
 var polygons = [];
 var lines = [];
+
+var life;
 
 window.onload = init;
 
@@ -61,7 +62,6 @@ function init()
     document.addEventListener('mousemove', handleMouseMove, false);
     document.addEventListener('keypress', handleCharacterInput, false);
 
-    messageBox = $('#message');
     optionsBox = $('#options');
     debugBox = $('#debug');
 
@@ -70,14 +70,14 @@ function init()
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        messageBox.html("WebGL is not available!");
+        console.log("WebGL is not available!");
     } else {
-        messageBox.html("WebGL up and running!");
+        console.log("WebGL up and running!");
     }
 
     renderMenu();
 
-    gl.clearColor(1, 1, 1, 1);
+    gl.clearColor(0.8, 0.8, 0.8, 1);
 
     // Load shaders and get uniform locations
     shaderProgram.program = InitShaders(gl, "2d-vertex-shader", "minimal-fragment-shader");
@@ -107,24 +107,9 @@ function init()
     CheckError();
 
     // Set up a bit of geometry to render
+    var gridHeight = floor(gridWidth / aspectRatio / sqrt(3) * 2);
 
-    var i;
-    for (i = 0; i < 11; ++i)
-        circles.push(new Circle(-0.5 + 0.1*i, 0, colorGenerator.next(true), markerRadius));
-
-    var points = [];
-    for (i = 0; i < 5; ++i)
-        points.push({
-            x: 0.7*cos(2*pi/5*i),
-            y: 0.7*sin(2*pi/5*i),
-        });
-    polygons.push(new ConvexPolygon(points));
-
-    polygons.push(ConvexPolygon.CreateArrow(0.1, 0.05, {x:-0.7, y:0}, {x:1,y:0}));
-    polygons.push(ConvexPolygon.CreateArrow(0.1, 0.05, {x:0.73, y:0}, {x:1,y:0}));
-
-    lines.push(new Line({x: -0.5, y: 0.15}, {x: 0.5, y: 0.15}, 'white', lineThickness));
-    lines.push(new Line({x: -0.5, y: -0.15}, {x: 0.5, y: -0.15}, 'white', lineThickness));
+    life = new HexagonalLife(gridWidth, gridHeight);
 
     drawScreen();
     lastTime = Date.now();
@@ -159,7 +144,7 @@ function InitShaders(gl, vertexShaderId, fragmentShaderId)
     var vertexElement = document.getElementById(vertexShaderId);
     if(!vertexElement)
     {
-        messageBox.html("Unable to load vertex shader '" + vertexShaderId + "'");
+        console.log("Unable to load vertex shader '" + vertexShaderId + "'");
         return -1;
     }
     else
@@ -169,7 +154,7 @@ function InitShaders(gl, vertexShaderId, fragmentShaderId)
         gl.compileShader(vertexShader);
         if(!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
         {
-            messageBox.html("Vertex shader '" + vertexShaderId + "' failed to compile. The error log is:</br>" + gl.getShaderInfoLog(vertexShader));
+            console.log("Vertex shader '" + vertexShaderId + "' failed to compile. The error log is:</br>" + gl.getShaderInfoLog(vertexShader));
             return -1;
         }
     }
@@ -177,7 +162,7 @@ function InitShaders(gl, vertexShaderId, fragmentShaderId)
     var fragmentElement = document.getElementById(fragmentShaderId);
     if(!fragmentElement)
     {
-        messageBox.html("Unable to load fragment shader '" + fragmentShaderId + "'");
+        console.log("Unable to load fragment shader '" + fragmentShaderId + "'");
         return -1;
     }
     else
@@ -187,7 +172,7 @@ function InitShaders(gl, vertexShaderId, fragmentShaderId)
         gl.compileShader(fragmentShader);
         if(!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
         {
-            messageBox.html("Fragment shader '" + fragmentShaderId + "' failed to compile. The error log is:</br>" + gl.getShaderInfoLog(fragmentShader));
+            console.log("Fragment shader '" + fragmentShaderId + "' failed to compile. The error log is:</br>" + gl.getShaderInfoLog(fragmentShader));
             return -1;
         }
     }
@@ -199,7 +184,7 @@ function InitShaders(gl, vertexShaderId, fragmentShaderId)
 
     if(!gl.getProgramParameter(program, gl.LINK_STATUS))
     {
-        messageBox.html("Shader program failed to link. The error log is:</br>" + gl.getProgramInfoLog(program));
+        console.log("Shader program failed to link. The error log is:</br>" + gl.getProgramInfoLog(program));
         return -1;
     }
 
@@ -243,6 +228,7 @@ function drawScreen()
     gl.uniform1f(shaderProgram.uViewPortAngle, angle);
 
     // add rendering of your game objects/scene graph here
+    life.render();
 
     for (i = 0; i < polygons.length; ++i)
     {
@@ -331,7 +317,7 @@ function CheckError(msg)
     {
         var errMsg = "OpenGL error: " + error.toString(16);
         if (msg) { errMsg = msg + "</br>" + errMsg; }
-        messageBox.html(errMsg);
+        console.log(errMsg);
     }
 }
 

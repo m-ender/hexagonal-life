@@ -21,5 +21,9 @@ function sign(x) {
     return x ? (x < 0 ? -1 : 1) : 0;
 }
 
+function mod(x, y) {
+    return ((x % y) + y) % y;
+}
+
 var MAX_INT = 9007199254740992;
 var MIN_INT = -9007199254740992;

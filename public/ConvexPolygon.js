@@ -94,12 +94,15 @@ ConvexPolygon.prototype.show = function() { this.hidden = false; };
 // only an outline.
 // An optional color can overwrite the default (the color provided
 // in the constructor for solid rendering and black for outlines).
-ConvexPolygon.prototype.render = function(outline, color) {
+ConvexPolygon.prototype.render = function(outline, x, y, color) {
     if (this.hidden) return;
+
+    x = x || 0;
+    y = y || 0;
 
     gl.useProgram(shaderProgram.program);
 
-    gl.uniform2f(shaderProgram.uCenter, 0, 0);
+    gl.uniform2f(shaderProgram.uCenter, x, y);
     gl.uniform1f(shaderProgram.uScale, 1);
     gl.uniform1f(shaderProgram.uAngle, 0);
 

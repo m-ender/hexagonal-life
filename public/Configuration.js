@@ -14,3 +14,5 @@ var pixelSize;
 var markerRadius;
 // Default line width
 var lineThickness;
+
+var gridWidth = 50;
